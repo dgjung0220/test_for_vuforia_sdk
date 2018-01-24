@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.bearpot.artest.R;
-import com.bearpot.artest.app.ObjectRecognition.ObjectTargets;
+import com.bearpot.artest.app.MultiTargets.MultiTargets;
 
 /**
  * Created by dg.jung on 2018-01-22.
@@ -21,13 +21,13 @@ public class ActivityLauncher extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        object_detect = (Button) findViewById(R.id.Object_Detect);
+        object_detect = (Button) findViewById(R.id.object_detection);
 
         object_detect.setOnClickListener(new Button.OnClickListener() {
 
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(ActivityLauncher.this, ObjectTargets.class);
+                Intent intent = new Intent(ActivityLauncher.this, MultiTargets.class);
                 startActivity(intent);
             }
         });

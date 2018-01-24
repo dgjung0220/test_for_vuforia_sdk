@@ -17,8 +17,8 @@ import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.util.Log;
 
-import com.bearpot.artest.app.ObjectRecognition.utils.SampleUtils;
-import com.bearpot.artest.app.ObjectRecognition.utils.VideoBackgroundShader;
+import com.bearpot.artest.utils.SampleUtils;
+import com.bearpot.artest.utils.VideoBackgroundShader;
 import com.vuforia.COORDINATE_SYSTEM_TYPE;
 import com.vuforia.CameraDevice;
 import com.vuforia.Device;
@@ -41,7 +41,7 @@ import com.vuforia.ViewList;
 
 public class ARAppRenderer {
 
-    private static final String LOGTAG = "SampleAppRenderer";
+    private static final String LOGTAG = "ARAppRenderer";
 
     private RenderingPrimitives mRenderingPrimitives = null;
     private ARAppRendererControl mRenderingInterface = null;
@@ -351,7 +351,6 @@ public class ARAppRenderer {
                 + mScreenHeight + "), mSize (" + xSize + " , " + ySize + ")");
 
         Renderer.getInstance().setVideoBackgroundConfig(config);
-
     }
 
 
