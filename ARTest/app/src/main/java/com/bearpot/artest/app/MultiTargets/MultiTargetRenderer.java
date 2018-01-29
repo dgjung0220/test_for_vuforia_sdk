@@ -13,10 +13,13 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.util.Log;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.bearpot.artest.ARAppRenderer;
 import com.bearpot.artest.ARAppRendererControl;
 import com.bearpot.artest.ARApplicationSession;
+import com.bearpot.artest.R;
 import com.bearpot.artest.utils.CubeObject;
 import com.bearpot.artest.utils.CubeShaders;
 import com.bearpot.artest.utils.SampleUtils;
@@ -31,14 +34,12 @@ import com.vuforia.Tool;
 import com.vuforia.Trackable;
 import com.vuforia.TrackableResult;
 import com.vuforia.Vuforia;
-
 import java.util.Vector;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 
-// The renderer class for the MultiTargets sample. 
 public class MultiTargetRenderer implements GLSurfaceView.Renderer, ARAppRendererControl
 {
     private static final String LOGTAG = "MultiTargetRenderer";
@@ -50,12 +51,12 @@ public class MultiTargetRenderer implements GLSurfaceView.Renderer, ARAppRendere
     private boolean mIsActive = false;
     
     private int shaderProgramID;
-    
+
     private int vertexHandle;
     private int textureCoordHandle;
     private int mvpMatrixHandle;
     private int texSampler2DHandle;
-    
+
     private Vector<Texture> mTextures;
     private int opacityHandle;
     private int colorHandle;
@@ -66,16 +67,10 @@ public class MultiTargetRenderer implements GLSurfaceView.Renderer, ARAppRendere
     private CubeObject cubeObject = new CubeObject();
     private BowlAndSpoonObject bowlAndSpoonObject = new BowlAndSpoonObject();
 
-    // Constants:
-    final static float kCubeScaleX = 0.12f * 0.75f / 2.0f;
-    final static float kCubeScaleY = 0.12f * 1.00f / 2.0f;
-    final static float kCubeScaleZ = 0.12f * 0.50f / 2.0f;
-
     final static float kBowlScaleX = 0.12f * 0.15f;
     final static float kBowlScaleY = 0.12f * 0.15f;
     final static float kBowlScaleZ = 0.12f * 0.15f;
-    
-    
+
     public MultiTargetRenderer(MultiTargets activity, ARApplicationSession session)
     {
         mActivity = activity;
@@ -85,8 +80,7 @@ public class MultiTargetRenderer implements GLSurfaceView.Renderer, ARAppRendere
         // the device mode AR/VR and stereo mode
         mSampleAppRenderer = new ARAppRenderer(this, mActivity, Device.MODE.MODE_AR, false, 0.010f, 5f);
     }
-    
-    
+
     // Called when the surface is created or recreated.
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config)
@@ -96,7 +90,6 @@ public class MultiTargetRenderer implements GLSurfaceView.Renderer, ARAppRendere
         // Call Vuforia function to (re)initialize rendering after first use
         // or after OpenGL ES context was lost (e.g. after onPause/onResume):
         vuforiaAppSession.onSurfaceCreated();
-
         mSampleAppRenderer.onSurfaceCreated();
     }
 
@@ -143,11 +136,8 @@ public class MultiTargetRenderer implements GLSurfaceView.Renderer, ARAppRendere
     {
         Log.d(LOGTAG, "initRendering");
         
-        // Define clear color
-        GLES20.glClearColor(0.0f, 0.0f, 0.0f, Vuforia.requiresAlpha() ? 0.0f
-            : 1.0f);
+        GLES20.glClearColor(0.0f, 0.0f, 0.0f, Vuforia.requiresAlpha() ? 0.0f : 1.0f);
         
-        // Now generate the OpenGL texture objects and add settings
         for (Texture t : mTextures)
         {
             GLES20.glGenTextures(1, t.mTextureID, 0);
@@ -163,15 +153,10 @@ public class MultiTargetRenderer implements GLSurfaceView.Renderer, ARAppRendere
         textureCoordHandle = GLES20.glGetAttribLocation(shaderProgramID, "vertexTexCoord");
         mvpMatrixHandle = GLES20.glGetUniformLocation(shaderProgramID, "modelViewProjectionMatrix");
         texSampler2DHandle = GLES20.glGetUniformLocation(shaderProgramID, "texSampler2D");
-
         opacityHandle = GLES20.glGetUniformLocation(shaderProgramID, "opacity");
         colorHandle = GLES20.glGetUniformLocation(shaderProgramID, "color");
     }
 
-
-    // The render function called from SampleAppRendering by using RenderingPrimitives views.
-    // The state is owned by SampleAppRenderer which is controlling it's lifecycle.
-    // State should not be cached outside this method.
     public void renderFrame(State state, float[] projectionMatrix)
     {
         SampleUtils.checkGLError("Check gl errors prior render Frame");
@@ -212,6 +197,7 @@ public class MultiTargetRenderer implements GLSurfaceView.Renderer, ARAppRendere
             }
 
             ObjectTarget objectTarget = (ObjectTarget) result.getTrackable();
+
             float[] objectSize = objectTarget.getSize().getData();
 
             Matrix44F modelViewMatrix_Vuforia = Tool.convertPose2GLMatrix(result.getPose());
@@ -246,7 +232,6 @@ public class MultiTargetRenderer implements GLSurfaceView.Renderer, ARAppRendere
 
             // Draw the bowl:
             modelViewMatrix = modelViewMatrix_Vuforia.getData();
-
             animateBowl(modelViewMatrix);
             Matrix.translateM(modelViewMatrix, 0, 0.0f, -0.50f * 0.12f, 0.00135f * 0.12f);
             Matrix.rotateM(modelViewMatrix, 0, -90.0f, 1.0f, 0, 0);
@@ -262,9 +247,6 @@ public class MultiTargetRenderer implements GLSurfaceView.Renderer, ARAppRendere
 
             GLES20.glDisableVertexAttribArray(vertexHandle);
             GLES20.glDisableVertexAttribArray(textureCoordHandle);
-
-            // Draw a text
-
 
             SampleUtils.checkGLError("MultiTargets renderFrame");
         }
@@ -299,9 +281,7 @@ public class MultiTargetRenderer implements GLSurfaceView.Renderer, ARAppRendere
 
     private void printUserData(Trackable trackable)
     {
-        String userData = (String) trackable.getUserData(); // "Current Dataset : moomin"
-
+        String userData = (String) trackable.getUserData(); // "moomin"
         Log.d(LOGTAG, "UserData:Retreived User Data	\"" + userData + "\"");
-        Log.d("DONGGOO", "UserData:Retreived User Data	\"" + userData + "\"");
     }
 }

@@ -38,12 +38,12 @@
 
         <activity android:name=".ui.ActivityLauncher"/>
 
-        <activity
+        <!--<activity
             android:name=".app.ObjectRecognition.ObjectTargets"
             android:configChanges="orientation|keyboardHidden|screenSize|smallestScreenSize"
             android:theme="@style/AppTheme"
             android:launchMode="singleTask">
-        </activity>
+        </activity>-->
         <activity
             android:name=".app.MultiTargets.MultiTargets"
             android:configChanges="orientation|keyboardHidden|screenSize|smallestScreenSize"

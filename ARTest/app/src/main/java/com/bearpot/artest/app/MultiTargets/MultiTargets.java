@@ -17,11 +17,8 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.RelativeLayout;
@@ -35,18 +32,12 @@ import com.bearpot.artest.utils.LoadingDialogHandler;
 import com.bearpot.artest.utils.Texture;
 import com.vuforia.CameraDevice;
 import com.vuforia.DataSet;
-import com.vuforia.ImageTarget;
-import com.vuforia.Matrix34F;
-import com.vuforia.MultiTarget;
-import com.vuforia.MultiTargetResult;
 import com.vuforia.ObjectTracker;
 import com.vuforia.STORAGE_TYPE;
 import com.vuforia.State;
-import com.vuforia.Tool;
 import com.vuforia.Trackable;
 import com.vuforia.Tracker;
 import com.vuforia.TrackerManager;
-import com.vuforia.Vec3F;
 import com.vuforia.Vuforia;
 
 import java.util.Vector;
@@ -66,8 +57,6 @@ public class MultiTargets extends Activity implements ARApplicationControl {
     private MultiTargetRenderer mRenderer;
     
     private RelativeLayout mUILayout;
-    
-    private GestureDetector mGestureDetector;
 
     private LoadingDialogHandler loadingDialogHandler = new LoadingDialogHandler(this);
     
@@ -91,73 +80,21 @@ public class MultiTargets extends Activity implements ARApplicationControl {
         super.onCreate(savedInstanceState);
         
         vuforiaAppSession = new ARApplicationSession(this);
-        
         startLoadingAnimation();
-        
         vuforiaAppSession.initAR(this, ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         
         // Load any sample specific textures:
         mTextures = new Vector<Texture>();
         loadTextures();
-        
-        mGestureDetector = new GestureDetector(this, new GestureListener());
-        
         mIsDroidDevice = android.os.Build.MODEL.toLowerCase().startsWith("droid");
-        
     }
-    
-    // Process Single Tap event to trigger autofocus
-    private class GestureListener extends
-        GestureDetector.SimpleOnGestureListener
-    {
-        // Used to set autofocus one second after a manual focus is triggered
-        private final Handler autofocusHandler = new Handler();
-        
-        
-        @Override
-        public boolean onDown(MotionEvent e)
-        {
-            return true;
-        }
-        
-        
-        @Override
-        public boolean onSingleTapUp(MotionEvent e)
-        {
-            boolean result = CameraDevice.getInstance().setFocusMode(
-                    CameraDevice.FOCUS_MODE.FOCUS_MODE_TRIGGERAUTO);
-            if (!result)
-                Log.e("SingleTapUp", "Unable to trigger focus");
 
-            // Generates a Handler to trigger continuous auto-focus
-            // after 1 second
-            autofocusHandler.postDelayed(new Runnable()
-            {
-                public void run()
-                {
-                    final boolean autofocusResult = CameraDevice.getInstance().setFocusMode(
-                                CameraDevice.FOCUS_MODE.FOCUS_MODE_CONTINUOUSAUTO);
-
-                    if (!autofocusResult)
-                        Log.e("SingleTapUp", "Unable to re-enable continuous auto-focus");
-                }
-            }, 1000L);
-            
-            return true;
-        }
-    }
-    
-    
-    // We want to load specific textures from the APK, which we will later use
-    // for rendering.
     private void loadTextures()
     {
         mTextures.add(Texture.loadTextureFromApk("ObjectRecognition/TextureWireframe.png", getAssets()));
         mTextures.add(Texture.loadTextureFromApk("ObjectRecognition/TextureBowlAndSpoon.png", getAssets()));
     }
     
-    
-    // Called when the activity will start interacting with the user.
     @Override
     protected void onResume()
     {
@@ -242,8 +179,7 @@ public class MultiTargets extends Activity implements ARApplicationControl {
             .sendEmptyMessage(LoadingDialogHandler.SHOW_LOADING_DIALOG);
         
         // Adds the inflated layout to the view
-        addContentView(mUILayout, new LayoutParams(LayoutParams.MATCH_PARENT,
-            LayoutParams.MATCH_PARENT));
+        addContentView(mUILayout, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
     }
     
     
@@ -325,9 +261,9 @@ public class MultiTargets extends Activity implements ARApplicationControl {
 
             String name = trackable.getName();
             trackable.setUserData(name);
+
             Log.d("DONGGOO", "Set the following user data " + (String)trackable.getUserData());
         }
-        
         return true;
     }
     
