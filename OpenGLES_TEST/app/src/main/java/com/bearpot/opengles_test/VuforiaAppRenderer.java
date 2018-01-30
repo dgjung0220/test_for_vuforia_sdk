@@ -2,6 +2,7 @@ package com.bearpot.opengles_test;
 
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.opengl.Matrix;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -12,11 +13,12 @@ import javax.microedition.khronos.opengles.GL10;
 
 public class VuforiaAppRenderer implements GLSurfaceView.Renderer {
 
-    private final float[] mMVPMatrix = new float[16];
+    private final float[] mMVPMatrix = new float[16];               // mMVPMatrix is an abbreviation for "Model View Projection Matrix"
     private final float[] mProjectionMatrix = new float[16];
     private final float[] mViewMatrix = new float[16];
 
     private Triangle mTriangle;
+    public volatile float mAngle;
 
     public static int loadShader(int type, String shaderCode) {
         // type - vertex shader (GLES20.GL_VERTEX_SHADER
@@ -46,7 +48,18 @@ public class VuforiaAppRenderer implements GLSurfaceView.Renderer {
         // 기타
         // depth buffer : GL_DEPTH_BFFER_BIT
         // stencil buffer : GL_STENCIL_BFFER_BIT
-        mTriangle.draw();
+
+        // 카메라 위치를 나타내는 Camera view Matrix를 정의
+        Matrix.setLookAtM(mViewMatrix, 0, 0, 0, -3, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
+        Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
+
+        float[] scratch = new float[16];
+        float[] mRotationMatrix = new float[16];
+
+        Matrix.setRotateM(mRotationMatrix, 0, mAngle, 0, 0, -1.0f);
+        Matrix.multiplyMM(scratch, 0, mMVPMatrix, 0, mRotationMatrix, 0);
+
+        mTriangle.draw(scratch);
     }
 
     // GLSurfaceView의 크기 변경 또는 디바이스 화면의 방향 전환 등으로 인해 GLSurfaceView의 geometry가 바뀔 때 호출되는 메소드.
@@ -54,5 +67,17 @@ public class VuforiaAppRenderer implements GLSurfaceView.Renderer {
     public void onSurfaceChanged(GL10 gl10, int width, int height) {
         // Viewport 설정
         GLES20.glViewport(0,0, width, height);
+
+        // GLSurfaceView 너비와 높이 사이의 비율 계산.
+        float ratio = (float) width / height;
+        // 3차원 공간의 점을 2차원 화면에 보여주기 위해 사용되는 projection matrix
+        Matrix.frustumM(mProjectionMatrix, 0, -ratio, ratio, -1, 1, 3, 7);
+    }
+
+    public float getAngle() {
+        return mAngle;
+    }
+    public void setAngle(float angle) {
+        mAngle = angle;
     }
 }

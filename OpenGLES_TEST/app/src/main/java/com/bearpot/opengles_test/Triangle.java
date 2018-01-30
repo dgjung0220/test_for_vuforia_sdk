@@ -14,9 +14,10 @@ import java.nio.FloatBuffer;
 public class Triangle {
 
     private final String vertexShaderCode =
+            "uniform mat4 uMVPMatrix;" +
             "attribute vec4 vPosition;" +
             "void main() {" +
-            "  gl_Position = vPosition;" +
+            "  gl_Position = uMVPMatrix * vPosition;" +
             "}";
 
     private final String fragmentShaderCode =
@@ -30,7 +31,7 @@ public class Triangle {
     private final int mProgram;
     private int mPositionHandle;
     private int mColorHandle;
-
+    private int mMVPMatrixHandle;
 
     // 1. 삼각형 vertex를 위한 좌표
     static final int COORDS_PER_VERTEX = 3;
@@ -67,7 +68,7 @@ public class Triangle {
         GLES20.glLinkProgram(mProgram);
     }
 
-    public void draw() {
+    public void draw(float[] mvpMatrix) {
 
         Log.d("DONGGOO", "Triangle Draw");
         GLES20.glUseProgram(mProgram);
@@ -79,8 +80,13 @@ public class Triangle {
 
         // Program 객체로부터  fragment shader의 vColor 멤버에 대한 핸들을 가져옴.
         mColorHandle = GLES20.glGetUniformLocation(mProgram, "vColor");
+        mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
 
         GLES20.glUniform4fv(mColorHandle, 1, color, 0);
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vertexCount);
+        GLES20.glDisableVertexAttribArray(mPositionHandle);
+
+        GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mvpMatrix, 0);
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vertexCount);
         GLES20.glDisableVertexAttribArray(mPositionHandle);
     }
