@@ -59,8 +59,8 @@ public class Triangle {
         // 6. 읽어올 버퍼의 위치를 0으로 설정.
         vertexBuffer.position(0);
 
-        int vertexShader = VuforiaAppRenderer.loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode);
-        int fragmentShader = VuforiaAppRenderer.loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
+        int vertexShader = VuMarkRenderer.loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode);
+        int fragmentShader = VuMarkRenderer.loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
 
         mProgram = GLES20.glCreateProgram();
         GLES20.glAttachShader(mProgram, vertexShader);
